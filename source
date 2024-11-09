@@ -14,30 +14,13 @@ local OrionLib = {
 	Flags = {},
 	Themes = {
 		Default = {
-			Main: {
-        Color: Color3.fromRGB(201, 153, 175),
-        Transparency: 0.3  // Añadir transparencia al fondo principal
-      },
-      Second: {
-        Color: Color3.fromRGB(240, 153, 175),
-        Transparency: 0.3  // Añadir transparencia al fondo secundario
-      },
-      Stroke: {
-        Color: Color3.fromRGB(60, 60, 60),
-        Transparency: 0.3  // Añadir transparencia a los bordes
-      },
-      Divider: {
-        Color: Color3.fromRGB(60, 60, 60),
-        Transparency: 0.3  // Añadir transparencia a los divisores
-      },
-      Text: {
-        Color: Color3.fromRGB(240, 240, 240),
-        Transparency: 0  // El texto se mantiene opaco para legibilidad
-      },
-      TextDark: {
-        Color: Color3.fromRGB(150, 150, 150),
-        Transparency: 0  // El texto oscuro se mantiene opaco
-      }
+			Main = Color3.fromRGB(201, 153, 175):lerp(Color3.new(1,1,1), 0.3),
+			Second = Color3.fromRGB(240, 153, 175):lerp(Color3.new(1,1,1), 0.3),
+			Stroke = Color3.fromRGB(60, 60, 60):lerp(Color3.new(1,1,1), 0.3),
+			Divider = Color3.fromRGB(60, 60, 60):lerp(Color3.new(1,1,1), 0.3),
+			Text = Color3.fromRGB(240, 240, 240):lerp(Color3.new(1,1,1), 0.3),
+			TextDark = Color3.fromRGB(150, 150, 150):lerp(Color3.new(1,1,1), 0.3)
+		}
 	},
 	SelectedTheme = "Default",
 	Folder = nil,
@@ -215,43 +198,30 @@ local function ReturnProperty(Object)
 	end   
 end
 
-local function AddThemeObject(Object, Type) {
-  if (!OrionLib.ThemeObjects[Type]) {
-    OrionLib.ThemeObjects[Type] = {};
-  }    
-  table.insert(OrionLib.ThemeObjects[Type], Object);
-  
-  // Aplicar color y transparencia
-  local Property = ReturnProperty(Object);
-  Object[Property] = OrionLib.Themes[OrionLib.SelectedTheme][Type].Color;
-  
-  // Aplicar transparencia si el objeto la soporta
-  if (Object:IsA("Frame") or Object:IsA("TextButton") or Object:IsA("TextLabel") or Object:IsA("ImageLabel")) {
-    Object.BackgroundTransparency = OrionLib.Themes[OrionLib.SelectedTheme][Type].Transparency;
-  }
-  if (Object:IsA("UIStroke")) {
-    Object.Transparency = OrionLib.Themes[OrionLib.SelectedTheme][Type].Transparency;
-  }
-  
-  return Object;
-}
+local function AddThemeObject(Object, Type)
+	if not OrionLib.ThemeObjects[Type] then
+		OrionLib.ThemeObjects[Type] = {}
+	end    
+	table.insert(OrionLib.ThemeObjects[Type], Object)
+	Object[ReturnProperty(Object)] = OrionLib.Themes[OrionLib.SelectedTheme][Type]
+	return Object
+end    
 
-local function SetTheme() {
-  for Name, Type in pairs(OrionLib.ThemeObjects) {
-    for _, Object in pairs(Type) {
-      local Property = ReturnProperty(Object);
-      Object[Property] = OrionLib.Themes[OrionLib.SelectedTheme][Name].Color;
-      
-      // Actualizar transparencia
-      if (Object:IsA("Frame") or Object:IsA("TextButton") or Object:IsA("TextLabel") or Object:IsA("ImageLabel")) {
-        Object.BackgroundTransparency = OrionLib.Themes[OrionLib.SelectedTheme][Name].Transparency;
-      }
-      if (Object:IsA("UIStroke")) {
-        Object.Transparency = OrionLib.Themes[OrionLib.SelectedTheme][Name].Transparency;
-      }
-    }    
-  }    
-}
+local function SetTheme()
+	for Name, Type in pairs(OrionLib.ThemeObjects) do
+		for _, Object in pairs(Type) do
+			Object[ReturnProperty(Object)] = OrionLib.Themes[OrionLib.SelectedTheme][Name]
+		end    
+	end    
+end
+
+local function PackColor(Color)
+	return {R = Color.R * 255, G = Color.G * 255, B = Color.B * 255}
+end    
+
+local function UnpackColor(Color)
+	return Color3.fromRGB(Color.R, Color.G, Color.B)
+end
 
 local function LoadCfg(Config)
 	local Data = HttpService:JSONDecode(Config)
