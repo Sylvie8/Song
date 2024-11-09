@@ -600,7 +600,6 @@ function OrionLib:MakeWindow(WindowConfig)
 				Visible = not WindowConfig.HidePremium
 			}), "TextDark")
 		}),
-               BackgroundTransparency = 0.5
 	}), "Second")
 
 	local WindowName = AddThemeObject(SetProps(MakeElement("Label", WindowConfig.Name, 14), {
