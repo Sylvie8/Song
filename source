@@ -615,7 +615,7 @@ function OrionLib:MakeWindow(WindowConfig)
     Position = UDim2.new(0.5, -307, 0.5, -172),
     Size = UDim2.new(0, 615, 0, 344),
     ClipsDescendants = true,
-BackgroundTransparency = 0.5
+    BackgroundTransparency = 0.5  -- Añade esta línea para hacer la GUI semi-transparente
 }), {
 
 		--SetProps(MakeElement("Image", "rbxassetid://3523728077"), {
@@ -678,7 +678,7 @@ BackgroundTransparency = 0.5
 
 	AddConnection(MinimizeBtn.MouseButton1Up, function()
     if Minimized then
-        TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 615, 0, 344), BackgroundTransparency = 0.5}):Play()
+        TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 615, 0, 344), BackgroundTransparency = 0}):Play()
         MinimizeBtn.Ico.Image = "rbxassetid://7072719338"
         wait(.02)
         MainWindow.ClipsDescendants = false
