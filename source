@@ -19,9 +19,7 @@ local OrionLib = {
         -- Añadir transparencia para Second
         SecondTransparency = 0.5,
 			Stroke = Color3.fromRGB(60, 60, 60):lerp(Color3.new(1,1,1), 0.3),
-        StrokeTransparency = 0.5, 
-        Divider = Color3.fromRGB(60, 60, 60):lerp(Color3.new(1,1,1), 0.3),
-        DividerTransparency = 0.5,
+			Divider = Color3.fromRGB(60, 60, 60):lerp(Color3.new(1,1,1), 0.3),
 			Text = Color3.fromRGB(240, 240, 240):lerp(Color3.new(1,1,1), 0.3),
 			TextDark = Color3.fromRGB(150, 150, 150):lerp(Color3.new(1,1,1), 0.3)
 		}
@@ -558,9 +556,8 @@ function OrionLib:MakeWindow(WindowConfig)
 		}), "Second"), 
 		AddThemeObject(SetProps(MakeElement("Frame"), {
 			Size = UDim2.new(0, 1, 1, 0),
-			Position = UDim2.new(1, -1, 0, 0),
-        BackgroundTransparency = OrionLib.Themes.Default.StrokeTransparency -- Aplica transparencia de Stroke
-    }), "Stroke"), 
+			Position = UDim2.new(1, -1, 0, 0)
+		}), "Stroke"), 
 		TabHolder,
 		SetChildren(SetProps(MakeElement("TFrame"), {
 			Size = UDim2.new(1, 0, 0, 50),
