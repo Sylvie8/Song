@@ -276,6 +276,7 @@ CreateElement("Stroke", function(Color, Thickness)
 	local Stroke = Create("UIStroke", {
 		Color = Color or Color3.fromRGB(255, 255, 255),
 		Thickness = Thickness or 1
+                StrokeTran = 0.5
 	})
 	return Stroke
 end)
