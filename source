@@ -276,7 +276,6 @@ CreateElement("Stroke", function(Color, Thickness)
 	local Stroke = Create("UIStroke", {
 		Color = Color or Color3.fromRGB(255, 255, 255),
 		Thickness = Thickness or 1
-                StrokeTran = 0.5
 	})
 	return Stroke
 end)
@@ -616,7 +615,7 @@ function OrionLib:MakeWindow(WindowConfig)
     Position = UDim2.new(0.5, -307, 0.5, -172),
     Size = UDim2.new(0, 615, 0, 344),
     ClipsDescendants = true,
-    BackgroundTransparency = 0.5  -- Añade esta línea para hacer la GUI semi-transparente
+BackgroundTransparency = 0.5
 }), {
 
 		--SetProps(MakeElement("Image", "rbxassetid://3523728077"), {
@@ -679,7 +678,7 @@ function OrionLib:MakeWindow(WindowConfig)
 
 	AddConnection(MinimizeBtn.MouseButton1Up, function()
     if Minimized then
-        TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 615, 0, 344), BackgroundTransparency = 0}):Play()
+        TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 615, 0, 344), BackgroundTransparency = 0.5}):Play()
         MinimizeBtn.Ico.Image = "rbxassetid://7072719338"
         wait(.02)
         MainWindow.ClipsDescendants = false
