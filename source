@@ -14,7 +14,7 @@ local OrionLib = {
 	Flags = {},
 	Themes = {
 		Default = {
-			Main = Color3.fromRGB(250, 153, 175):lerp(Color3.new(1,1,1), 0.3),
+			Main = Color3.fromRGB(201, 153, 175):lerp(Color3.new(1,1,1), 0.3),
 			Second = Color3.fromRGB(240, 153, 175):lerp(Color3.new(1,1,1), 0.3),
         -- Añadir transparencia para Second
         SecondTransparency = 0.5,
