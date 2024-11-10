@@ -532,7 +532,7 @@ function OrionLib:MakeWindow(WindowConfig)
     Size = UDim2.new(1, 0, 1, 0),
     BackgroundTransparency = 1
 }), {
-    AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://YOUR_IMAGE_ID"), {
+    AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://8834748103"), {
         Size = UDim2.new(0, 40, 0, 40),
         Position = UDim2.new(0.5, -20, 0.5, -20),
         Name = "Ico"
