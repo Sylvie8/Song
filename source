@@ -569,7 +569,8 @@ BackgroundTransparency = OrionLib.Themes.Default.StrokeTransparency
 			Position = UDim2.new(0, 0, 1, -50)
 		}), {
 			AddThemeObject(SetProps(MakeElement("Frame"), {
-				Size = UDim2.new(1, 0, 0, 1)
+				Size = UDim2.new(1, 0, 0, 1), 
+BackgroundTransparency = OrionLib.Themes.Default.StrokeTransparency
 			}), "Stroke"), 
 			AddThemeObject(SetChildren(SetProps(MakeElement("Frame"), {
 				AnchorPoint = Vector2.new(0, 0.5),
@@ -582,6 +583,7 @@ BackgroundTransparency = OrionLib.Themes.Default.DividerTransparency
 				}),
 				AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://4031889928"), {
 					Size = UDim2.new(1, 0, 1, 0),
+BackgroundTransparency = OrionLib.Themes.Default.SecondTransparency
 				}), "Second"),
 				MakeElement("Corner", 1)
 			}), "Divider"),
