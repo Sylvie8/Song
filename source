@@ -681,7 +681,7 @@ AddConnection(MinimizeBtn.MouseButton1Up, function()
         MainWindow.TopBar.MinimizeIcon.Visible = true
 
         TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 40, 0, 40),
+            Size = UDim2.new(0, 80, 0, 80),
             BackgroundTransparency = 0.5
         }):Play()
         wait(0.1)
