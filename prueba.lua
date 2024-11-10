@@ -250,7 +250,7 @@ local Lobby = Window:MakeTab({
 })
 
 Tab:AddToggle({
-    Name = "Monster ESP",
+    Name = "Monster ESP88",
     Default = true,
     Flag = "monsterESP",
     Save = true,
