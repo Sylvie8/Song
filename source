@@ -689,26 +689,61 @@ BackgroundTransparency = 0.5
 
 	AddConnection(MinimizeBtn.MouseButton1Up, function()
     if Minimized then
-        TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 615, 0, 344), BackgroundTransparency = 0.5}):Play()
-        MinimizeBtn.Ico.Image = "rbxassetid://7072719338"
-        wait(.02)
-        MainWindow.ClipsDescendants = false
+        -- Maximizing
+        TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 615, 0, 344),
+            BackgroundTransparency = 0.5
+        }):Play()
+        
+        -- Show all elements
         WindowStuff.Visible = true
         WindowTopBarLine.Visible = true
+        WindowName.Visible = true
+        MinimizeBtn.Parent.Visible = true -- Hide the button container
+        
+        -- Hide the minimize image
+        if MainWindow:FindFirstChild("MinimizeImage") then
+            MainWindow.MinimizeImage.Visible = false
+        end
+        
+        MainWindow.ClipsDescendants = false
     else
+        -- Minimizing
         MainWindow.ClipsDescendants = true
         WindowTopBarLine.Visible = false
-        MinimizeBtn.Ico.Image = "rbxassetid://7072720870"
-
+        WindowStuff.Visible = false
+        WindowName.Visible = false
+        MinimizeBtn.Parent.Visible = false -- Hide the button container
+        
+        -- Create or show minimize image if it doesn't exist
+        if not MainWindow:FindFirstChild("MinimizeImage") then
+            local minImage = Instance.new("ImageButton")
+            minImage.Name = "MinimizeImage"
+            minImage.Image = "rbxassetid://8834748103" -- Reemplaza con el ID de tu imagen
+            minImage.Size = UDim2.new(0, 40, 0, 40)
+            minImage.Position = UDim2.new(0, 0, 0, 0)
+            minImage.BackgroundTransparency = 1
+            minImage.Parent = MainWindow
+            
+            -- Add click handler to maximize
+            minImage.MouseButton1Click:Connect(function()
+                Minimized = true
+                MinimizeBtn.MouseButton1Up:Fire()
+            end)
+        else
+            MainWindow.MinimizeImage.Visible = true
+        end
+        
+        -- Minimize animation
         TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, WindowName.TextBounds.X + 140, 0, 50),
-            BackgroundTransparency = 0.5  -- This will make it semi-transparent when minimized
+            Size = UDim2.new(0, 40, 0, 40),
+            BackgroundTransparency = 0.5
         }):Play()
-        wait(0.1)
-        WindowStuff.Visible = false    
     end
+    
     Minimized = not Minimized    
 end)
+
 
 	local function LoadSequence()
 		MainWindow.Visible = false
