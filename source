@@ -19,7 +19,9 @@ local OrionLib = {
         -- Añadir transparencia para Second
         SecondTransparency = 0.5,
 			Stroke = Color3.fromRGB(255, 255, 255):lerp(Color3.new(1,1,1), 0.3),
+        StrokeTransparency = 0.5, 
 			Divider = Color3.fromRGB(255, 153, 175):lerp(Color3.new(1,1,1), 0.3),
+        DividerTransparency = 0.5,
 			Text = Color3.fromRGB(240, 240, 240):lerp(Color3.new(1,1,1), 0.3),
 			TextDark = Color3.fromRGB(150, 150, 150):lerp(Color3.new(1,1,1), 0.3)
 		}
@@ -558,7 +560,8 @@ BackgroundTransparency = OrionLib.Themes.Default.SecondTransparency
 		}), "Second"), 
 		AddThemeObject(SetProps(MakeElement("Frame"), {
 			Size = UDim2.new(0, 1, 1, 0),
-			Position = UDim2.new(1, -1, 0, 0)
+			Position = UDim2.new(1, -1, 0, 0),
+BackgroundTransparency = OrionLib.Themes.Default.StrokeTransparency
 		}), "Stroke"), 
 		TabHolder,
 		SetChildren(SetProps(MakeElement("TFrame"), {
@@ -571,7 +574,8 @@ BackgroundTransparency = OrionLib.Themes.Default.SecondTransparency
 			AddThemeObject(SetChildren(SetProps(MakeElement("Frame"), {
 				AnchorPoint = Vector2.new(0, 0.5),
 				Size = UDim2.new(0, 32, 0, 32),
-				Position = UDim2.new(0, 10, 0.5, 0)
+				Position = UDim2.new(0, 10, 0.5, 0), 
+BackgroundTransparency = OrionLib.Themes.Default.DividerTransparency
 			}), {
 				SetProps(MakeElement("Image", "https://www.roblox.com/headshot-thumbnail/image?userId=".. LocalPlayer.UserId .."&width=420&height=420&format=png"), {
 					Size = UDim2.new(1, 0, 1, 0)
