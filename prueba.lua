@@ -540,7 +540,7 @@ game:GetService("RunService").Heartbeat:Connect(function()
         if not humanoid:GetAttribute("IsCrouching") then  -- Ajusta esto según tu forma de verificar el estado de agachado
             humanoid.WalkSpeed = sp
         else
-            humanoid.WalkSpeed = 16  -- Define la velocidad cuando está agachado
+            humanoid.WalkSpeed = 14  -- Define la velocidad cuando está agachado
         end
     end
 end)
