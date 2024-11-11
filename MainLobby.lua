@@ -13,7 +13,7 @@ getGlobalTable().MaxPlayers = game.Players.MaxPlayers
 getGlobalTable().FireHubLoaded = true
 local closed = false
 local cons = {}
-local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/InfernusScripts/Null-Fire/main/Core/Libraries/Fire-Lib/Main.lua"))()
+local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sylvie8/Song/refs/heads/main/MainLibLobby.lua"))()
 local plr = game.Players.LocalPlayer
 
 local ftiv = false
