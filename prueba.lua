@@ -535,7 +535,14 @@ end
 
 -- Update player speed
 game:GetService("RunService").Heartbeat:Connect(function()
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = sp
+    local humanoid = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+    if humanoid then
+        if not humanoid:GetAttribute("IsCrouching") then  -- Ajusta esto según tu forma de verificar el estado de agachado
+            humanoid.WalkSpeed = sp
+        else
+            humanoid.WalkSpeed = 16  -- Define la velocidad cuando está agachado
+        end
+    end
 end)
 
 -- Add dragging functionality if needed
