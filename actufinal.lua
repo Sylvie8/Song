@@ -514,7 +514,7 @@ othscripts:AddButton({
 
 
 othscripts:AddButton({
-    Name = "God Mode",
+    Name = "God Mode (Desactivar Notificaciones)",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/ltseverydayyou/uuuuuuu/main/pressure%20god.lua"))()
     end    
