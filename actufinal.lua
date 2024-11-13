@@ -19,20 +19,36 @@ local fakeDoor = {}
 local maxVisibleDoors = 1
 local maxVisibleFakeDoors = 3
 
+
 -- Configuración de la ventana principal
 local Window = OrionLib:MakeWindow({
-    Name = "Sylvie",
+    Name = "DmN",
     HidePremium = false,
     SaveConfig = true,
-    ConfigFolder = "Sylvie"
+    ConfigFolder = "DmN"
 })
 
+
+
 -- Creación de pestañas
-local Tab = Window:MakeTab({
+local Maikn = Window:MakeTab({
     Name = "Main",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
 })
+
+local espp = Window:MakeTab({
+    Name = "ESP",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local others = Window:MakeTab({
+    Name = "Otros",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
 
 local Lobby = Window:MakeTab({
     Name = "Lobby",
@@ -40,17 +56,13 @@ local Lobby = Window:MakeTab({
     PremiumOnly = false
 })
 
-local credits = Window:MakeTab({
-    Name = "Credits",
+
+local othscripts = Window:MakeTab({
+    Name = "Sub Scripts",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
 })
 
-local others = Window:MakeTab({
-    Name = "other stuff",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
 
 -- Funciones de utilidad para ESP
 local function createBillboardGui(name, adornee, text, textColor)
@@ -76,13 +88,14 @@ local function createBillboardGui(name, adornee, text, textColor)
     connection = adornee.AncestryChanged:Connect(function(_, parent)
         if not parent then
             gui:Destroy()
+            
             -- Also destroy highlight if it exists
             local highlight = game.CoreGui:FindFirstChild(name .. "Highlight")
             if highlight and highlight.Adornee == adornee then
                 highlight:Destroy()
             end
             connection:Disconnect()
-            
+
             -- Remove from respective tables
             if name == "key" then
                 for i, v in ipairs(key) do
@@ -104,9 +117,9 @@ local function createBillboardGui(name, adornee, text, textColor)
             end
         end
     end)
-
     return gui
 end
+
 
 local function getKeyColor(keyType)
     if keyType == "NormalKeyCard" then
@@ -128,10 +141,10 @@ local function getMonsterColor(monsterName)
         Blitz = Color3.fromRGB(228, 251, 251),   -- Light blue
         Pandemonium = Color3.fromRGB(60, 0, 0), -- Red
         WallDweller = Color3.fromRGB(136, 138, 138), -- Gray
-        RottenWallDweller = Color3.fromRGB(2, 104, 66), -- Dark green
-        Chainsmoker = Color3.fromRGB(90, 181, 7), -- Light green
-        Eyefestation = Color3.fromRGB(155, 250, 176), -- Lime green
-        ["A-60"] = Color3.fromRGB(150, 0, 24)     -- Wine red
+        RottenWallDweller = Color3.fromRGB(2, 104, 66),
+        Chainsmoker = Color3.fromRGB(90, 181, 7),
+        Eyefestation = Color3.fromRGB(155, 250, 176),
+        ["A-60"] = Color3.fromRGB(150, 0, 24) 
     }
     return colors[monsterName] or Color3.new(238, 14, 14)
 end
@@ -140,12 +153,10 @@ end
 local function applykey(inst)
     local keyType = inst:GetAttribute("InteractionType")
     local keyColor = getKeyColor(keyType)
-    
+
     -- Create text GUI
     local gui = createBillboardGui("key", inst, inst.Name, keyColor)
     table.insert(key, gui)
-    
-    -- Set opacity based on key type
     local fillTransparency = 0.2  -- Default value
     if keyType == "KeyCard" then
         fillTransparency = 0.2    -- 0.8 opacity (1 - 0.2)
@@ -155,6 +166,7 @@ local function applykey(inst)
         fillTransparency = 0.2    -- 0.6 opacity (1 - 0.4)
     end
     
+
     -- Create highlight with adjusted opacity
     local highlight = Instance.new("Highlight")
     highlight.Name = "keyHighlight"
@@ -164,10 +176,11 @@ local function applykey(inst)
     highlight.FillTransparency = fillTransparency
     highlight.OutlineTransparency = 0.7
     highlight.Parent = game.CoreGui
-    
+
     -- Store both GUI and highlight for cleanup
     table.insert(key, {TextGui = gui, Highlight = highlight})
 end
+
 
 local function applymos(inst)
     local monsterColor = getMonsterColor(inst.Name)
@@ -190,7 +203,7 @@ local function detectMonster(inst)
 
         -- Verificar si el nombre del monstruo está en la lista permitida
         if not table.find(allowedMonsters, inst.Name) then return end
-
+        
         -- Detección por efectos visuales (Beam)
         if inst:IsA("Beam") and inst.Parent:IsA("Part") then
             task.wait(0.05)
@@ -199,9 +212,7 @@ local function detectMonster(inst)
                inst.Parent:FindFirstChildOfClass("Attachment") and 
                inst.Parent.Parent == workspace and 
                not applied[inst.Parent] then
-                
                 applied[inst.Parent] = true
-                
                 if OrionLib.Flags.NotifyMonster.Value then
                     OrionLib:MakeNotification({
                         Name = "Monster Detected",
@@ -210,12 +221,14 @@ local function detectMonster(inst)
                         Time = 10
                     })
                 end
-                
+
+
                 if OrionLib.Flags.monsters.Value then
                     applymos(inst.Parent)
                 end
             end
         end
+
 
         -- Detección de Wall Dweller
         if (inst.Name == "WallDweller" or inst.Name == "RottenWallDweller") and inst:IsA("Model") then
@@ -227,16 +240,19 @@ local function detectMonster(inst)
             Time = 10
         })
     end
+    
     if OrionLib.Flags.monsters.Value then
         applymos(inst)
     end
 end
+
 
         -- Detección por DeathFolder
         local monsterNames = {}
         for _, descendant in ipairs(game.ReplicatedStorage.DeathFolder:GetDescendants()) do
             table.insert(monsterNames, descendant.Name)
         end
+
 
         if table.find(monsterNames, inst.Name) then
             if OrionLib.Flags.NotifyMonster.Value then
@@ -247,16 +263,19 @@ end
                     Time = 10
                 })
             end
-            
+
             if OrionLib.Flags.monsters.Value then
                 applymos(inst)
             end
-            
+
             if OrionLib.Flags.avoids.Value then
+            
                 local oldpos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+
                 local tp = game:GetService("RunService").Heartbeat:Connect(function()
                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(p.Position)
                 end)
+
                 inst.Destroying:Wait()
                 tp:Disconnect()
                 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(oldpos)
@@ -266,12 +285,14 @@ end
 end
 
 
+
 local function applyDoor(inst)
     if #door >= maxVisibleDoors then
         door[1].TextGui:Destroy()
         door[1].Highlight:Destroy()
         table.remove(door, 1)
     end
+
 
     local textGui = Instance.new("BillboardGui")
     textGui.Name = "doorText"
@@ -281,6 +302,7 @@ local function applyDoor(inst)
     textGui.AlwaysOnTop = true
     textGui.Parent = game.CoreGui
 
+
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, 0, 1, 0)
     label.Text = "Door"
@@ -289,6 +311,7 @@ local function applyDoor(inst)
     label.TextStrokeTransparency = 0
     label.TextScaled = true
     label.Parent = textGui
+
 
     local highlight = Instance.new("Highlight")
     highlight.Name = "doorHighlight"
@@ -302,12 +325,14 @@ local function applyDoor(inst)
     table.insert(door, {TextGui = textGui, Highlight = highlight})
 end
 
+
 local function applyFakeDoor(inst)
     if #fakeDoor >= maxVisibleFakeDoors then
         fakeDoor[1].TextGui:Destroy()
         fakeDoor[1].Highlight:Destroy()
         table.remove(fakeDoor, 1)
     end
+
 
     local textGui = Instance.new("BillboardGui")
     textGui.Name = "fakeDoorText"
@@ -317,6 +342,7 @@ local function applyFakeDoor(inst)
     textGui.AlwaysOnTop = true
     textGui.Parent = game.CoreGui
 
+
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, 0, 1, 0)
     label.Text = "Fake Door"
@@ -325,6 +351,7 @@ local function applyFakeDoor(inst)
     label.TextStrokeTransparency = 0
     label.TextScaled = true
     label.Parent = textGui
+
 
     local highlight = Instance.new("Highlight")
     highlight.Name = "fakeDoorHighlight"
@@ -338,28 +365,26 @@ local function applyFakeDoor(inst)
     table.insert(fakeDoor, {TextGui = textGui, Highlight = highlight})
 end
 
+
+
 -- Configuración de la interfaz
-Lobby:AddButton({
-    Name = "Join Random Game (could be yourself or another player)",
-    Callback = function()
-        game:GetService("TeleportService"):Teleport(12552538292, game.Players.LocalPlayer)
-    end    
-})
 
-Tab:AddSlider({
+Maikn:AddTextbox({
     Name = "Set Walkspeed",
-    Min = 0,
-    Max = 100,
-    Default = 16,
-    Color = Color3.fromRGB(255,255,255),
-    Increment = 1,
-    ValueName = "sp",
+    Default = "16",
+    TextDisappear = false,
     Callback = function(Value)
-        sp = Value
-    end    
+        -- Convert input to number and validate
+        local newSpeed = tonumber(Value)
+        if newSpeed then
+            -- Clamp value between 0 and 100 for safety
+            sp = math.clamp(newSpeed, 0, 100)
+        end
+    end
 })
 
-Tab:AddButton({
+
+Maikn:AddButton({
     Name = "Fullbright",
     Callback = function()
         local lighting = game.Lighting
@@ -371,35 +396,26 @@ Tab:AddButton({
     end    
 })
 
-Tab:AddButton({
-    Name = "Give Permanent NormalKey (pick a normalkey first)",
-    Callback = function()
-        game.Players.LocalPlayer.PlayerFolder.Inventory.NormalKeyCard:Destroy()
-        local d = Instance.new("NumberValue")
-        d.Name = "NormalKeyCard"
-        d.Parent = game.Players.LocalPlayer.PlayerFolder.Inventory
-    end    
+Maikn:AddToggle({
+    Name = "Notify Monster",
+    Default = false,
+    Flag = "NotifyMonster",
+    Save = true
 })
 
-Tab:AddButton({
-    Name = "Give Permanent InnerKeyCard (pick a InnerKeyCard first)",
-    Callback = function()
-        game.Players.LocalPlayer.PlayerFolder.Inventory.InnerKeyCard:Destroy()
-        local d = Instance.new("NumberValue")
-        d.Name = "InnerKeyCard"
-        d.Parent = game.Players.LocalPlayer.PlayerFolder.Inventory
-    end    
-})
+-- Toggles Main
 
--- Toggles
-Tab:AddToggle({
-    Name = "no proxmitiyprompt duration",
+Maikn:AddToggle({
+    Name = "Insta open door",
     Default = true,
     Flag = "asdas",
     Save = true
 })
 
-Tab:AddToggle({
+
+
+-- Toggles Esp
+espp:AddToggle({
     Name = "Door ESP",
     Default = true,
     Flag = "doorESP",
@@ -411,7 +427,8 @@ Tab:AddToggle({
     end    
 })
 
-Tab:AddToggle({
+
+espp:AddToggle({
     Name = "Fake Door ESP",
     Default = true,
     Flag = "fakeDoorESP",
@@ -423,7 +440,8 @@ Tab:AddToggle({
     end    
 })
 
-Tab:AddToggle({
+
+espp:AddToggle({
     Name = "Key ESP",
     Default = true,
     Flag = "keys",
@@ -435,43 +453,8 @@ Tab:AddToggle({
     end    
 })
 
-Tab:AddToggle({
-    Name = "Notify Monster",
-    Default = false,
-    Flag = "NotifyMonster",
-    Save = true
-})
 
-Tab:AddToggle({
-    Name = "Avoid any Monster (tested)",
-    Default = false,
-    Flag = "avoids",
-    Save = true
-})
-
-Tab:AddToggle({
-    Name = "No Eyefestation",
-    Default = false,
-    Flag = "noeyefestation",
-    Save = true
-})
-
-Tab:AddToggle({
-    Name = "No Searchlights",
-    Default = false,
-    Flag = "Searchlights",
-    Save = true
-})
-
-Tab:AddToggle({
-    Name = "No Steams",
-    Default = false,
-    Flag = "steaming",
-    Save = true
-})
-
-
-Tab:AddToggle({
+espp:AddToggle({
     Name = "Monster ESP",
     Default = true,
     Flag = "monsters",
@@ -484,7 +467,7 @@ Tab:AddToggle({
 })
 
 
-Tab:AddToggle({
+espp:AddToggle({
     Name = "Monster Locker ESP",
     Default = true,
     Flag = "monsterlocker",
@@ -496,23 +479,62 @@ Tab:AddToggle({
     end    
 })
 
--- Créditos y otras opciones
-credits:AddParagraph("Credits to playvora", "https://scriptblox.com/script/Pressure-script-15848")
-credits:AddParagraph("https://www.roblox.com/users/2207117597/profile")
 
-others:AddButton({
+-- Toggles Others
+others:AddToggle({
+    Name = "No Eyefestation",
+    Default = false,
+    Flag = "noeyefestation",
+    Save = true
+})
+
+
+others:AddToggle({
+    Name = "No Searchlights",
+    Default = false,
+    Flag = "Searchlights",
+    Save = true
+})
+
+
+
+-- Toggles Lobby
+Lobby:AddButton({
+    Name = "Join Random Game",
+    Callback = function()
+        game:GetService("TeleportService"):Teleport(12552538292, game.Players.LocalPlayer)
+    end    
+})
+
+
+
+-- Toggles Scripts 
+othscripts:AddButton({
     Name = "Infinity Yield",
     Callback = function()
         loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
     end    
 })
 
-others:AddButton({
+
+othscripts:AddButton({
     Name = "Dex",
     Callback = function()
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/infyiff/backup/main/dex.lua'))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua", true))()
     end    
 })
+
+
+othscripts:AddButton({
+    Name = "God Mode",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ltseverydayyou/uuuuuuu/main/pressure%20god.lua"))()
+    end    
+})
+
+
+
+
 
 
 -- Conexión de eventos principales
@@ -527,7 +549,6 @@ local keycor = coroutine.create(function()
     end)
 end)
 coroutine.resume(keycor)
-
 
 
 workspace.DescendantAdded:Connect(function(inst)
@@ -561,8 +582,10 @@ workspace.DescendantAdded:Connect(function(inst)
     end
 end)
 
+
 workspace.ChildAdded:Connect(detectMonster)
 workspace.DescendantAdded:Connect(detectMonster)
+
 
 -- Inicialización de ESP para lockers existentes
 for _, v in ipairs(workspace:GetDescendants()) do
@@ -570,6 +593,7 @@ for _, v in ipairs(workspace:GetDescendants()) do
         applylocker(v)
     end
 end
+
 
 for _, v in ipairs(workspace.Rooms:GetDescendants()) do
     if v.Name == "OpenValue" and v.Parent.Parent.Name == "Entrances" and OrionLib.Flags.doorESP.Value then
@@ -588,6 +612,7 @@ for _, v in ipairs(workspace.Rooms:GetDescendants()) do
         applykey(v)
     end
 end
+
 
 -- Control de velocidad del jugador
 game:GetService("RunService").Heartbeat:Connect(function()
