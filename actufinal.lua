@@ -57,7 +57,7 @@ local function createBillboardGui(name, adornee, text, textColor)
     local gui = Instance.new("BillboardGui")
     gui.Name = name
     gui.Adornee = adornee
-    gui.Size = UDim2.new(0, 80, 0, 50)
+    gui.Size = UDim2.new(0, 80, 0, 20)
     gui.StudsOffset = Vector3.new(0, 2, 0)
     gui.AlwaysOnTop = true
     gui.Parent = game.CoreGui
@@ -109,7 +109,7 @@ local function createBillboardGui(name, adornee, text, textColor)
 end
 
 local function getKeyColor(keyType)
-    if keyType == "KeyCard" then
+    if keyType == "NormalKeyCard" then
         return Color3.fromRGB(184, 228, 255)
     elseif keyType == "InnerKeyCard" then
         return Color3.fromRGB(231, 158, 255)
@@ -122,18 +122,19 @@ end
 
 local function getMonsterColor(monsterName)
     local colors = {
-        Angler = Color3.fromRGB(0, 0, 255),      -- Blue
-        Froger = Color3.fromRGB(255, 255, 0),    -- Yellow
-        Pinkie = Color3.fromRGB(255, 192, 203),  -- Pink
-        Blitz = Color3.fromRGB(135, 206, 235),   -- Light blue
-        Pandemonium = Color3.fromRGB(255, 0, 0), -- Red
-        WallDweller = Color3.fromRGB(128, 128, 128), -- Gray
-        RottenWallDweller = Color3.fromRGB(0, 100, 0), -- Dark green
-        Chainsmoker = Color3.fromRGB(144, 238, 144), -- Light green
-        Eyefestation = Color3.fromRGB(190, 255, 0), -- Lime green
-        ["A-60"] = Color3.fromRGB(139, 0, 0)     -- Wine red
+        Angler = Color3.fromRGB(80, 134, 193),      -- Blue
+        Froger = Color3.fromRGB(253, 253, 150),    -- Yellow
+        Pinkie = Color3.fromRGB(143, 113, 147),  -- Pink
+        Blitz = Color3.fromRGB(228, 251, 251),   -- Light blue
+        Pandemonium = Color3.fromRGB(60, 0, 0), -- Red
+        WallDweller = Color3.fromRGB(136, 138, 138), -- Gray
+        Wall Dweller = Color3.fromRGB(136, 138, 138), -- Gray
+        RottenWallDweller = Color3.fromRGB(2, 104, 66), -- Dark green
+        Chainsmoker = Color3.fromRGB(90, 181, 7), -- Light green
+        Eyefestation = Color3.fromRGB(155, 250, 176), -- Lime green
+        ["A-60"] = Color3.fromRGB(150, 0, 24)     -- Wine red
     }
-    return colors[monsterName] or Color3.new(1, 0, 0)
+    return colors[monsterName] or Color3.new(238, 14, 14)
 end
 
 
@@ -182,7 +183,7 @@ end
 
 
 -- Sistema de detección de monstruos mejorado
-local allowedMonsters = {"Angler", "Froger", "highlight", "Pinkie", "Blitz", "RemoteEvent", "Pandemonium", "WallDweller", "RottenWallDweller", "Chainsmoker", "Eyefestation", "A-60"}
+local allowedMonsters = {"Angler", "Froger", "highlight", "Pinkie", "Blitz", "RemoteEvent", "Pandemonium", "WallDweller", "RottenWallDweller", "Chainsmoker", "Eyefestation", "A-60", "Wall Dweller"}
 
 local function detectMonster(inst)
     task.spawn(function()
@@ -575,10 +576,13 @@ for _, v in ipairs(workspace.Rooms:GetDescendants()) do
     if v.Name == "Door" and v.Parent.Name == "TricksterDoor" and OrionLib.Flags.fakeDoorESP.Value then
         applyFakeDoor(v)
     end
-    if v:IsA("Model") and v:GetAttribute("InteractionType") == "KeyCard" then
+    if v:IsA("Model") and v:GetAttribute("InteractionType") == "NormalKeyCard" then
         applykey(v)
     end
     if v:IsA("Model") and v:GetAttribute("InteractionType") == "InnerKeyCard" then
+        applykey(v)
+    end
+    if v:IsA("Model") and v:GetAttribute("InteractionType") == "RidgeKeyCard" then
         applykey(v)
     end
 end
