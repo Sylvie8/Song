@@ -147,7 +147,7 @@ local function applykey(inst)
     
     -- Set opacity based on key type
     local fillTransparency = 0.2  -- Default value
-    if keyType == "NormalKeyCard" then
+    if keyType == "KeyCard" then
         fillTransparency = 0.2    -- 0.8 opacity (1 - 0.2)
     elseif keyType == "InnerKeyCard" then
         fillTransparency = 0.2    -- 0.4 opacity (1 - 0.6)
@@ -578,7 +578,7 @@ for _, v in ipairs(workspace.Rooms:GetDescendants()) do
     if v.Name == "Door" and v.Parent.Name == "TricksterDoor" and OrionLib.Flags.fakeDoorESP.Value then
         applyFakeDoor(v)
     end
-    if v:IsA("Model") and v:GetAttribute("InteractionType") == "NormalKeyCard" then
+    if v:IsA("Model") and v:GetAttribute("InteractionType") == "KeyCard" then
         applykey(v)
     end
     if v:IsA("Model") and v:GetAttribute("InteractionType") == "InnerKeyCard" then
