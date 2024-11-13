@@ -219,17 +219,18 @@ local function detectMonster(inst)
 
         -- Detección de Wall Dweller
         if (inst.Name == "WallDweller" or inst.Name == "RottenWallDweller") and inst:IsA("Model") then
-            if OrionLib.Flags.NotifyMonster.Value then
-                OrionLib:MakeNotification({
-                    Name = "Wall Dweller",
-                    Content = "Wall Dweller has spawned! Turn around!",
-                    Image = "rbxassetid://4483345998",
-                    Time = 10
-                })
-            end
-                if OrionLib.Flags.monsters.Value then
-                applymos(inst)
-        end
+    if OrionLib.Flags.NotifyMonster.Value then
+        OrionLib:MakeNotification({
+            Name = "Wall Dweller",
+            Content = "Wall Dweller has spawned! Turn around!",
+            Image = "rbxassetid://4483345998",
+            Time = 10
+        })
+    end
+    if OrionLib.Flags.monsters.Value then
+        applymos(inst)
+    end
+end
 
         -- Detección por DeathFolder
         local monsterNames = {}
