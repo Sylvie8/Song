@@ -57,7 +57,7 @@ local function createBillboardGui(name, adornee, text, textColor)
     local gui = Instance.new("BillboardGui")
     gui.Name = name
     gui.Adornee = adornee
-    gui.Size = UDim2.new(0, 200, 0, 50)
+    gui.Size = UDim2.new(0, 80, 0, 50)
     gui.StudsOffset = Vector3.new(0, 2, 0)
     gui.AlwaysOnTop = true
     gui.Parent = game.CoreGui
@@ -145,13 +145,23 @@ local function applykey(inst)
     local gui = createBillboardGui("key", inst, inst.Name, keyColor)
     table.insert(key, gui)
     
-    -- Create highlight
+    -- Set opacity based on key type
+    local fillTransparency = 0.2  -- Default value
+    if keyType == "NormalKeyCard" then
+        fillTransparency = 0.2    -- 0.8 opacity (1 - 0.2)
+    elseif keyType == "InnerKeyCard" then
+        fillTransparency = 0.2    -- 0.4 opacity (1 - 0.6)
+    elseif keyType == "RidgeKeyCard" then
+        fillTransparency = 0.2    -- 0.6 opacity (1 - 0.4)
+    end
+    
+    -- Create highlight with adjusted opacity
     local highlight = Instance.new("Highlight")
     highlight.Name = "keyHighlight"
     highlight.Adornee = inst
     highlight.FillColor = keyColor
     highlight.OutlineColor = keyColor
-    highlight.FillTransparency = 0.3
+    highlight.FillTransparency = fillTransparency
     highlight.OutlineTransparency = 0.7
     highlight.Parent = game.CoreGui
     
