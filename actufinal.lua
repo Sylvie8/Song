@@ -213,8 +213,6 @@ local function detectMonster(inst)
                inst.Parent.Parent == workspace and 
                not applied[inst.Parent] then
                 applied[inst.Parent] = true
-                end
-
 
                 if OrionLib.Flags.monsters.Value then
                     applymos(inst.Parent)
@@ -246,7 +244,6 @@ end
             table.insert(monsterNames, descendant.Name)
         end
 
-
         if table.find(monsterNames, inst.Name) then
             if OrionLib.Flags.NotifyMonster.Value then
                 OrionLib:MakeNotification({
@@ -262,7 +259,6 @@ end
             end
 
             if OrionLib.Flags.avoids.Value then
-            
                 local oldpos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
 
                 local tp = game:GetService("RunService").Heartbeat:Connect(function()
