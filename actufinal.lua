@@ -53,7 +53,7 @@ local others = Window:MakeTab({
 })
 
 -- Funciones de utilidad para ESP
-local function createBillboardGui(name, adornee, text, textColor, highlightColor)
+local function createBillboardGui(name, adornee, text, textColor)
     local gui = Instance.new("BillboardGui")
     gui.Name = name
     gui.Adornee = adornee
@@ -71,27 +71,25 @@ local function createBillboardGui(name, adornee, text, textColor, highlightColor
     label.TextScaled = true
     label.Parent = gui
 
-    local highlight = Instance.new("Highlight")
-    highlight.Name = name .. "Highlight"
-    highlight.Adornee = adornee
-    highlight.FillColor = highlightColor
-    highlight.OutlineColor = highlightColor
-    highlight.FillTransparency = 0.3
-    highlight.OutlineTransparency = 0.7
-    highlight.Parent = game.CoreGui
-
     -- Cleanup connection when adornee is destroyed
     local connection
     connection = adornee.AncestryChanged:Connect(function(_, parent)
         if not parent then
             gui:Destroy()
-            highlight:Destroy()
+            -- Also destroy highlight if it exists
+            local highlight = game.CoreGui:FindFirstChild(name .. "Highlight")
+            if highlight and highlight.Adornee == adornee then
+                highlight:Destroy()
+            end
             connection:Disconnect()
             
             -- Remove from respective tables
             if name == "key" then
                 for i, v in ipairs(key) do
-                    if v == gui then
+                    if v.TextGui == gui then
+                        if v.Highlight then
+                            v.Highlight:Destroy()
+                        end
                         table.remove(key, i)
                         break
                     end
@@ -103,48 +101,68 @@ local function createBillboardGui(name, adornee, text, textColor, highlightColor
                         break
                     end
                 end
-            elseif name == "locker" then
-                for i, v in ipairs(locker) do
-                    if v == gui then
-                        table.remove(locker, i)
-                        break
-                    end
-                end
-            elseif name == "trickster" then
-                for i, v in ipairs(trickster) do
-                    if v == gui then
-                        table.remove(trickster, i)
-                        break
-                    end
-                end
             end
         end
     end)
 
-    return gui, highlight
+    return gui
+end
+
+local function getKeyColor(keyType)
+    if keyType == "NormalKeyCard" then
+        return Color3.fromRGB(184, 228, 255)
+    elseif keyType == "InnerKeyCard" then
+        return Color3.fromRGB(231, 158, 255)
+    elseif keyType == "RidgeKeyCard" then
+        return Color3.fromRGB(255, 195, 64)
+    end
+    return Color3.new(1, 1, 1)
+end
+
+
+local function getMonsterColor(monsterName)
+    local colors = {
+        Angler = Color3.fromRGB(0, 0, 255),      -- Blue
+        Froger = Color3.fromRGB(255, 255, 0),    -- Yellow
+        Pinkie = Color3.fromRGB(255, 192, 203),  -- Pink
+        Blitz = Color3.fromRGB(135, 206, 235),   -- Light blue
+        Pandemonium = Color3.fromRGB(255, 0, 0), -- Red
+        WallDweller = Color3.fromRGB(128, 128, 128), -- Gray
+        RottenWallDweller = Color3.fromRGB(0, 100, 0), -- Dark green
+        Chainsmoker = Color3.fromRGB(144, 238, 144), -- Light green
+        Eyefestation = Color3.fromRGB(190, 255, 0), -- Lime green
+        ["A-60"] = Color3.fromRGB(139, 0, 0)     -- Wine red
+    }
+    return colors[monsterName] or Color3.new(1, 0, 0)
 end
 
 
 local function applykey(inst)
     local keyType = inst:GetAttribute("InteractionType")
-    local keyColor, keyText
+    local keyColor = getKeyColor(keyType)
     
-    if keyType == "KeyCard" then
-        keyColor = Color3.fromRGB(184, 228, 255)  -- NormalKey color
-        keyText = "NormalKey"
-    elseif keyType == "InnerKeyCard" then
-        keyColor = Color3.fromRGB(231, 158, 255)  -- InnerKeyCard color
-        keyText = "InnerKeyCard"
-    elseif keyType == "RidgeKeyCard" then
-        keyColor = Color3.fromRGB(255, 195, 64)   -- RidgeKeyCard color
-        keyText = "RidgeKeyCard"
-    else
-        keyColor = Color3.new(1, 1, 1)            -- Default white color
-        keyText = inst.Name
-    end
+    -- Create text GUI
+    local gui = createBillboardGui("key", inst, inst.Name, keyColor)
+    table.insert(key, gui)
     
-    local gui, highlight = createBillboardGui("key", inst, keyText, keyColor, keyColor)
+    -- Create highlight
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "keyHighlight"
+    highlight.Adornee = inst
+    highlight.FillColor = keyColor
+    highlight.OutlineColor = keyColor
+    highlight.FillTransparency = 0.3
+    highlight.OutlineTransparency = 0.7
+    highlight.Parent = game.CoreGui
+    
+    -- Store both GUI and highlight for cleanup
     table.insert(key, {TextGui = gui, Highlight = highlight})
+end
+
+local function applymos(inst)
+    local monsterColor = getMonsterColor(inst.Name)
+    local gui = createBillboardGui("mons", inst, inst.Name, monsterColor)
+    table.insert(monster, gui)
 end
 
 local function applylocker(inst)
@@ -398,9 +416,8 @@ Tab:AddToggle({
     Flag = "keys",
     Save = true,
     Callback = function(Value)
-        for _, esp in pairs(key) do
-            esp.TextGui.Enabled = Value
-            esp.Highlight.Enabled = Value
+        for _, cham in pairs(key) do
+            cham.Enabled = Value
         end
     end    
 })
@@ -548,9 +565,10 @@ for _, v in ipairs(workspace.Rooms:GetDescendants()) do
     if v.Name == "Door" and v.Parent.Name == "TricksterDoor" and OrionLib.Flags.fakeDoorESP.Value then
         applyFakeDoor(v)
     end
-    if v:IsA("Model") and (v:GetAttribute("InteractionType") == "KeyCard" or 
-                          v:GetAttribute("InteractionType") == "InnerKeyCard" or 
-                          v:GetAttribute("InteractionType") == "RidgeKeyCard") then
+    if v:IsA("Model") and v:GetAttribute("InteractionType") == "KeyCard" then
+        applykey(v)
+    end
+    if v:IsA("Model") and v:GetAttribute("InteractionType") == "InnerKeyCard" then
         applykey(v)
     end
 end
