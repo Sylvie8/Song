@@ -109,7 +109,7 @@ local function createBillboardGui(name, adornee, text, textColor)
 end
 
 local function getKeyColor(keyType)
-    if keyType == "NormalKeyCard" then
+    if keyType == "KeyCard" then
         return Color3.fromRGB(184, 228, 255)
     elseif keyType == "InnerKeyCard" then
         return Color3.fromRGB(231, 158, 255)
@@ -147,7 +147,7 @@ local function applykey(inst)
     
     -- Set opacity based on key type
     local fillTransparency = 0.2  -- Default value
-    if keyType == "NormalKeyCard" then
+    if keyType == "KeyCard" then
         fillTransparency = 0.2    -- 0.8 opacity (1 - 0.2)
     elseif keyType == "InnerKeyCard" then
         fillTransparency = 0.2    -- 0.4 opacity (1 - 0.6)
