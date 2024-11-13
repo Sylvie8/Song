@@ -122,7 +122,7 @@ end
 
 
 local function getKeyColor(keyType)
-    if keyType == "NormalKeyCard" then
+    if keyType == "KeyCard" then
         return Color3.fromRGB(184, 228, 255)
     elseif keyType == "InnerKeyCard" then
         return Color3.fromRGB(231, 158, 255)
