@@ -213,13 +213,6 @@ local function detectMonster(inst)
                inst.Parent.Parent == workspace and 
                not applied[inst.Parent] then
                 applied[inst.Parent] = true
-                if OrionLib.Flags.NotifyMonster.Value then
-                    OrionLib:MakeNotification({
-                        Name = "Monster Detected",
-                        Content = inst.Parent.Name:gsub("Ridge", "") .. " has spawned! Hide!",
-                        Image = "rbxassetid://4483345998",
-                        Time = 10
-                    })
                 end
 
 
@@ -235,7 +228,7 @@ local function detectMonster(inst)
     if OrionLib.Flags.NotifyMonster.Value then
         OrionLib:MakeNotification({
             Name = "Wall Dweller",
-            Content = "Wall Dweller has spawned! Turn around!",
+            Content = "Wall Dweller has spawned! Cuidado!",
             Image = "rbxassetid://4483345998",
             Time = 10
         })
@@ -258,7 +251,7 @@ end
             if OrionLib.Flags.NotifyMonster.Value then
                 OrionLib:MakeNotification({
                     Name = "Monster Alert 1",
-                    Content = "A monster has spawned! Hide in the closet!",
+                    Content = inst.Name .. " has spawned! Hide!",
                     Image = "rbxassetid://4483345998",
                     Time = 10
                 })
@@ -482,20 +475,19 @@ espp:AddToggle({
 
 -- Toggles Others
 others:AddToggle({
-    Name = "No Eyefestation",
-    Default = false,
-    Flag = "noeyefestation",
-    Save = true
-})
-
-
-others:AddToggle({
     Name = "No Searchlights",
     Default = false,
     Flag = "Searchlights",
     Save = true
 })
 
+
+others:AddToggle({
+    Name = "Anti Eyefestation",
+    Default = false,
+    Flag = "AntiEyefestation",
+    Save = true
+})
 
 
 -- Toggles Lobby
@@ -546,6 +538,9 @@ local keycor = coroutine.create(function()
         if inst:IsA("Model") and inst:GetAttribute("InteractionType") == "InnerKeyCard" then
             applykey(inst)
         end
+        if inst:IsA("Model") and inst:GetAttribute("InteractionType") == "RidgeKeyCard" then
+            applykey(inst)
+        end
     end)
 end)
 coroutine.resume(keycor)
@@ -559,10 +554,6 @@ workspace.DescendantAdded:Connect(function(inst)
     if inst.Name == "Door" and inst.Parent.Name == "TricksterDoor" and OrionLib.Flags.fakeDoorESP.Value then
         task.wait(0.1)
         applyFakeDoor(inst)
-    end
-    if inst.Name == "Eyefestation" and OrionLib.Flags.noeyefestation.Value then
-        task.wait(0.1)
-        inst:Destroy()
     end
     if inst.Name == "SearchlightsEncounter" and OrionLib.Flags.Searchlights.Value then
         wait(10)
@@ -579,6 +570,21 @@ workspace.DescendantAdded:Connect(function(inst)
     if inst.Name == "MonsterLocker" and OrionLib.Flags.monsterlocker.Value then
         task.wait(0.1)
         applylocker(inst)
+    end
+    if inst.Name == "Eyefestation" and (inst.Parent.Name == "EyefestationSpawn" or inst.Parent.Name == "EyefestationRoot") then
+        task.spawn(function()
+            repeat task.wait() until inst and inst:FindFirstChild("Active") and inst.Active.Value or not inst
+            if not inst then return end
+            
+            task.spawn(function()
+                while inst and inst.Parent and inst:FindFirstChild("Active") and not closed do
+                    if OrionLib.Flags.AntiEyefestation.Value then
+                        inst.Active.Value = false
+                    end
+                    task.wait()
+                end
+            end)
+        end)
     end
 end)
 
