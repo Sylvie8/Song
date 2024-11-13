@@ -128,7 +128,6 @@ local function getMonsterColor(monsterName)
         Blitz = Color3.fromRGB(228, 251, 251),   -- Light blue
         Pandemonium = Color3.fromRGB(60, 0, 0), -- Red
         WallDweller = Color3.fromRGB(136, 138, 138), -- Gray
-        ["Wall Dweller"] = Color3.fromRGB(136, 138, 138), -- Gray
         RottenWallDweller = Color3.fromRGB(2, 104, 66), -- Dark green
         Chainsmoker = Color3.fromRGB(90, 181, 7), -- Light green
         Eyefestation = Color3.fromRGB(155, 250, 176), -- Lime green
@@ -183,7 +182,7 @@ end
 
 
 -- Sistema de detección de monstruos mejorado
-local allowedMonsters = {"Angler", "Froger", "highlight", "Pinkie", "Blitz", "RemoteEvent", "Pandemonium", "WallDweller", "RottenWallDweller", "Chainsmoker", "Eyefestation", "A-60", "Wall Dweller"}
+local allowedMonsters = {"Angler", "Froger", "highlight", "Pinkie", "Blitz", "RemoteEvent", "Pandemonium", "WallDweller", "RottenWallDweller", "Chainsmoker", "Eyefestation", "A-60"}
 
 local function detectMonster(inst)
     task.spawn(function()
