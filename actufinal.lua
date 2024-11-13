@@ -228,6 +228,8 @@ local function detectMonster(inst)
                     Time = 10
                 })
             end
+                if OrionLib.Flags.monsters.Value then
+                applymos(inst)
         end
 
         -- Detección por DeathFolder
