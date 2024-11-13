@@ -147,7 +147,7 @@ local function applykey(inst)
     
     -- Set opacity based on key type
     local fillTransparency = 0.2  -- Default value
-    if keyType == "KeyCard" then
+    if keyType == "NormalKeyCard" then
         fillTransparency = 0.2    -- 0.8 opacity (1 - 0.2)
     elseif keyType == "InnerKeyCard" then
         fillTransparency = 0.2    -- 0.4 opacity (1 - 0.6)
