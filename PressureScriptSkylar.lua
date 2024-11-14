@@ -81,6 +81,28 @@ if not dropBtn then
     dropBtn.Icon.Image = "rbxassetid://14786143679"
 end
 
+local hBtn = game:GetService("Players").LocalPlayer.PlayerGui.Main.Controls.Mobile.BaseControls:FindFirstChild("HKey")
+if not hBtn then
+    hBtn = game:GetService("Players").LocalPlayer.PlayerGui.Main.Controls.Mobile.BaseControls.BindKey1:Clone()
+    hBtn.Parent = game:GetService("Players").LocalPlayer.PlayerGui.Main.Controls.Mobile.BaseControls
+    hBtn.Visible = false
+    hBtn.Name = "HKey"
+    hBtn.Position = UDim2.fromScale(0.581, -1.413) -- Positioned right next to Drop button
+    -- Modify the TextLabel to show "H"
+    if hBtn:FindFirstChild("Icon") then
+        hBtn.Icon:Destroy()
+    end
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Name = "HText"
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = "H"
+    textLabel.TextColor3 = Color3.new(1, 1, 1)
+    textLabel.TextScaled = true
+    textLabel.Font = Enum.Font.SourceSansBold
+    textLabel.Parent = hBtn
+end
+
 -- Add DropTool functionality
 dropBtn.Activated:Connect(function()
     local plr = game.Players.LocalPlayer
@@ -91,6 +113,15 @@ dropBtn.Activated:Connect(function()
         end
     end
 end)
+
+
+-- Add H key functionality
+hBtn.Activated:Connect(function()
+    game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.H, false, game)
+    wait()
+    game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.H, false, game)
+end)
+
 
 
 
@@ -737,6 +768,19 @@ others:AddToggle({
 })
 
 
+others:AddToggle({
+    Name = "Dance Button",
+    Default = false,
+    Flag = "HKeyButton",
+    Save = true,
+    Callback = function(Value)
+        if game.UserInputService.TouchEnabled and not game.UserInputService.MouseEnabled then
+            hBtn.Visible = Value
+        end
+    end
+})
+
+
 
 -- Toggles Lobby
 Lobby:AddButton({
@@ -920,8 +964,18 @@ end)
 
 
 game:GetService("RunService").Heartbeat:Connect(function()
-    if OrionLib.Flags.DropTool.Value and game.UserInputService.TouchEnabled and not game.UserInputService.MouseEnabled then
-        dropBtn.Visible = game.Players.LocalPlayer.Character ~= nil and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Model") ~= nil or false
+    if game.UserInputService.TouchEnabled and not game.UserInputService.MouseEnabled then
+        -- Update Drop button visibility
+        if OrionLib.Flags.DropTool.Value then
+            dropBtn.Visible = game.Players.LocalPlayer.Character ~= nil and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Model") ~= nil or false
+        end
+        
+        -- Update H button visibility
+        if OrionLib.Flags.HKeyButton.Value then
+            hBtn.Visible = true
+        else
+            hBtn.Visible = false
+        end
     end
 end)
 
