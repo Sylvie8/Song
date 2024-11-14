@@ -71,6 +71,29 @@ local othscripts = Window:MakeTab({
 })
 
 
+local dropBtn = game:GetService("Players").LocalPlayer.PlayerGui.Main.Controls.Mobile.BaseControls:FindFirstChild("Drop")
+if not dropBtn then
+    dropBtn = game:GetService("Players").LocalPlayer.PlayerGui.Main.Controls.Mobile.BaseControls.BindKey1:Clone()
+    dropBtn.Parent = game:GetService("Players").LocalPlayer.PlayerGui.Main.Controls.Mobile.BaseControls
+    dropBtn.Visible = false
+    dropBtn.Name = "Drop"
+    dropBtn.Position = UDim2.fromScale(0.481, -1.413)
+    dropBtn.Icon.Image = "rbxassetid://14786143679"
+end
+
+-- Add DropTool functionality
+dropBtn.Activated:Connect(function()
+    local plr = game.Players.LocalPlayer
+    if plr and plr.Character then
+        local tool = plr.Character:FindFirstChildOfClass("Model")
+        if tool then
+            game.ReplicatedStorage.Events.DropItem:FireServer(tool.Name)
+        end
+    end
+end)
+
+
+
 local function applyGenerator(inst)
     local textGui = Instance.new("BillboardGui")
     textGui.Name = "generatorText"
@@ -701,6 +724,20 @@ others:AddToggle({
 })
 
 
+others:AddToggle({
+    Name = "Drop Button",
+    Default = false,
+    Flag = "DropTool",
+    Save = true,
+    Callback = function(Value)
+        if game.UserInputService.TouchEnabled and not game.UserInputService.MouseEnabled then
+            dropBtn.Visible = Value and game.Players.LocalPlayer.Character ~= nil and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Model") ~= nil or false
+        end
+    end
+})
+
+
+
 -- Toggles Lobby
 Lobby:AddButton({
     Name = "Join Random Game",
@@ -879,6 +916,15 @@ spawn(function()
         end
     end
 end)
+
+
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    if OrionLib.Flags.DropTool.Value and game.UserInputService.TouchEnabled and not game.UserInputService.MouseEnabled then
+        dropBtn.Visible = game.Players.LocalPlayer.Character ~= nil and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Model") ~= nil or false
+    end
+end)
+
 
 
 -- Control de velocidad del jugador
