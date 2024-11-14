@@ -112,13 +112,11 @@ local function canCarry(v)
     return true
 end
 
-local function fireProximityPrompt(prompt)
-    if prompt.ClassName == "ProximityPrompt" then
-        prompt.InputHoldBegin()
-        task.wait()
-        prompt.InputHoldEnd()
-    end
-end
+cons[#cons+1] = game.ProximityPromptService.PromptButtonHoldBegan:Connect(function(pp)
+	if vals.II then
+		fireproximityprompt(pp)
+	end
+end)
 
 
 
