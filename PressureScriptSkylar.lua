@@ -9,6 +9,7 @@ p.Anchored = true
 p.Parent = workspace
 
 -- Variables globales
+local generators = {}
 local interacts = {}
 local sp = 16
 local applied = {}
@@ -69,6 +70,51 @@ local othscripts = Window:MakeTab({
     PremiumOnly = false
 })
 
+
+local function applyGenerator(inst)
+    local textGui = Instance.new("BillboardGui")
+    textGui.Name = "generatorText"
+    textGui.Adornee = inst
+    textGui.Size = UDim2.new(0, 80, 0, 20)
+    textGui.StudsOffset = Vector3.new(0, 2, 0)
+    textGui.AlwaysOnTop = true
+    textGui.Parent = game.CoreGui
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.Text = (inst.Parent.Name == "BrokenCables" and "Broken Cables" or "Broken Generator") .. "\n[" .. string.format("%03d", inst.Value):gsub("", " "):sub(2):sub(0, 5) .. "]"
+    label.TextColor3 = Color3.fromRGB(179, 128, 255)
+    label.BackgroundTransparency = 1
+    label.TextStrokeTransparency = 0
+    label.TextScaled = true
+    label.Parent = textGui
+
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "generatorHighlight"
+    highlight.Adornee = inst.Parent:FindFirstChild("Model") or inst.Parent
+    highlight.FillColor = Color3.fromRGB(179, 128, 255)
+    highlight.OutlineColor = Color3.fromRGB(179, 128, 255)
+    highlight.FillTransparency = 0.3
+    highlight.OutlineTransparency = 0.7
+    highlight.Parent = game.CoreGui
+
+    table.insert(generators, {TextGui = textGui, Highlight = highlight, Fixed = inst})
+
+    inst.Changed:Connect(function(val)
+        if val >= 87 or not inst or not inst.Parent or not inst.Parent:FindFirstChild("ProxyPart") or not inst.Parent.ProxyPart:FindFirstChild("ProximityPrompt") then
+            textGui:Destroy()
+            highlight:Destroy()
+            for i, v in ipairs(generators) do
+                if v.Fixed == inst then
+                    table.remove(generators, i)
+                    break
+                end
+            end
+        else
+            label.Text = (inst.Parent.Name == "BrokenCables" and "Broken Cables" or "Broken Generator") .. "\n[" .. string.format("%03d", val):gsub("", " "):sub(2):sub(0, 5) .. "]"
+        end
+    end)
+end
 
 local function optimizedCanCarry(v)
     if not v or 
@@ -623,6 +669,21 @@ espp:AddToggle({
 })
 
 
+espp:AddToggle({
+    Name = "Generador/Cables ESP",
+    Default = true,
+    Flag = "generatorESP",
+    Save = true,
+    Callback = function(Value)
+        for _, cham in pairs(generators) do
+            cham.TextGui.Enabled = Value
+            cham.Highlight.Enabled = Value
+        end
+    end    
+})
+
+
+
 -- Toggles Others
 others:AddToggle({
     Name = "No Searchlights",
@@ -697,6 +758,15 @@ coroutine.resume(keycor)
 
 
 workspace.DescendantAdded:Connect(function(inst)
+    if inst.Name == "Fixed" and inst:IsA("IntValue") and inst.Parent:IsA("Model") then
+        task.wait(0.1)
+        if inst and inst.Parent and inst.Value ~= 100 then
+            if inst.Value == 100 or not inst or not inst.Parent or not inst.Parent:FindFirstChild("ProxyPart") then return end
+            if OrionLib.Flags.generatorESP.Value then
+                applyGenerator(inst)
+            end
+        end
+    end
     if inst.Name == "ProxyPart" and inst.Parent:IsA("Model") then
         if inst.Parent.Parent:IsA("BasePart") and inst.Parent.Parent.Name ~= "ShopSpawn" then
             table.insert(interacts, inst)
@@ -752,6 +822,12 @@ workspace.DescendantAdded:Connect(detectMonster)
 for _, v in ipairs(workspace:GetDescendants()) do
     if v.Name == "MonsterLocker" and OrionLib.Flags.monsterlocker.Value then
         applylocker(v)
+    end
+    if v.Name == "Fixed" and v:IsA("IntValue") and v.Parent:IsA("Model") and v.Value ~= 100 then
+        if v.Value == 100 or not v or not v.Parent or not v.Parent:FindFirstChild("ProxyPart") then continue end
+        if OrionLib.Flags.generatorESP.Value then
+            applyGenerator(v)
+        end
     end
 end
 
