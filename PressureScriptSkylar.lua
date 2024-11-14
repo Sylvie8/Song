@@ -64,79 +64,63 @@ local othscripts = Window:MakeTab({
 })
 
 
-local autoPickupToggle = others:AddToggle({
-    Name = "Auto Pick up loots",
-    Default = false,
-    Flag = "AutoPickup",
-    Save = true,
-    Callback = function(Value)
-        if Value then
-            -- Start auto pickup loop
-            game:GetService("RunService").Heartbeat:Connect(function()
-                if OrionLib.Flags.AutoPickup.Value then
-                    autoPickup()
-                end
-            end)
-        end
-    end    
-})
 
-
-
-local function canCarry(item)
-    if not item or not item:FindFirstChild("ProximityPrompt") then
+-- Función para Auto Pick up
+local function canCarry(v)
+    if not v or not v:FindFirstChild("ProximityPrompt", math.huge) or not v:FindFirstChild("ProximityPrompt", math.huge).Enabled then
         return false
     end
     
-    local player = game.Players.LocalPlayer
+    if v:GetAttribute("Price") then return false end
     
-    -- Check if item has a price attribute
-    if item:GetAttribute("Price") then 
-        return false 
-    end
-    
-    -- Check if item is already in inventory
-    if player.PlayerFolder.Inventory:FindFirstChild(item.Name:gsub("Small", "Big"):gsub("Big", "")) then
-        -- Special case for keycards
-        if item.Name:match("KeyCard") then
+    local plr = game.Players.LocalPlayer
+    if not plr.PlayerFolder.Inventory:FindFirstChild(v.Name:gsub("Small", "Big"):gsub("Big", "")) then
+        if v:GetAttribute("InteractionType") == "KeyCard" and (plr.PlayerFolder.Inventory:FindFirstChild("NormalKeyCard") or plr.PlayerFolder.Inventory:FindFirstChild("RidgeKeyCard")) then
             return false
         end
-        
-        -- Check item attributes
-        local invItem = player.PlayerFolder.Inventory:FindFirstChild(item.Name:gsub("Small", "Big"):gsub("Big", ""))
-        
-        -- Check charge/uses attributes
-        for _, attr in ipairs({"Charge", "Uses"}) do
-            if item:GetAttribute(attr) then
-                return invItem.Value < item:GetAttribute(attr)
+        return true
+    else
+        if v.Name:match("KeyCard") then
+            return false
+        end
+
+        local item = plr.PlayerFolder.Inventory:FindFirstChild(v.Name:gsub("Small", "Big"):gsub("Big", ""))
+
+        local res = false
+        local doesExist = false
+        local function check(attr)
+            if v:GetAttribute(attr) then
+                doesExist = true
+                res = item.Value < v:GetAttribute(attr)
             end
         end
-        
-        -- Check max stack
-        local equipItem = game.ReplicatedStorage.EquipableItems:FindFirstChild(item.Name:gsub("Small", "Big"):gsub("Big", ""))
-        if equipItem and equipItem:GetAttribute("MaxStack") then
-            return invItem.Value < equipItem:GetAttribute("MaxStack")
+
+        check("Charge")
+        check("Uses")
+
+        if doesExist then
+            return res
         end
-        
-        return false
+
+        if game.ReplicatedStorage.EquipableItems:FindFirstChild(v.Name:gsub("Small", "Big"):gsub("Big", "")) then
+            local maxStack = game.ReplicatedStorage.EquipableItems[v.Name:gsub("Small", "Big"):gsub("Big", "")]:GetAttribute("MaxStack")
+            if maxStack then
+                return item.Value < maxStack
+            end
+        end
     end
-    
     return true
 end
 
--- Main auto pickup function
-local function autoPickup()
-    local player = game.Players.LocalPlayer
-    if not player.Character then return end
-    
-    for _, room in ipairs(workspace.Rooms:GetChildren()) do
-        for _, item in ipairs(room:GetDescendants()) do
-            if item:FindFirstChild("ProximityPrompt") and canCarry(item) then
-                fireproximityprompt(item.ProximityPrompt)
-            end
-        end
+local function fireProximityPrompt(prompt)
+    if prompt.ClassName == "ProximityPrompt" then
+        prompt.InputHoldBegin()
+        task.wait()
+        prompt.InputHoldEnd()
     end
 end
+
+
 
 -- Funciones de utilidad para ESP
 local function createBillboardGui(name, adornee, text, textColor)
@@ -476,6 +460,32 @@ Maikn:AddToggle({
 })
 
 
+Maikn:AddToggle({
+    Name = "Auto Pick up loots",
+    Default = false,
+    Flag = "AutoPickup",
+    Save = true,
+    Callback = function(Value)
+        if Value then
+            game:GetService("RunService").Heartbeat:Connect(function()
+                if OrionLib.Flags.AutoPickup.Value then
+                    local player = game.Players.LocalPlayer
+                    local character = player.Character
+                    if not character then return end
+
+                    for _, v in ipairs(workspace:GetDescendants()) do
+                        if v:IsA("Model") and v:FindFirstChild("ProximityPrompt") and canCarry(v) then
+                            local prompt = v:FindFirstChild("ProximityPrompt")
+                            if prompt and prompt.Enabled then
+                                fireProximityPrompt(prompt)
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end    
+})
 
 -- Toggles Esp
 espp:AddToggle({
