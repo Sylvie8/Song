@@ -112,9 +112,9 @@ local function canCarry(v)
     return true
 end
 
-cons[#cons+1] = game.ProximityPromptService.PromptButtonHoldBegan:Connect(function(pp)
+cons[#cons+1] = game.ProximityPromptService.PromptButtonHoldBegan:Connect(function(promt)
 	if vals.II then
-		fireproximityprompt(pp)
+		fireproximityprompt(promt)
 	end
 end)
 
