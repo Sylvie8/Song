@@ -19,6 +19,11 @@ local door = {}
 local fakeDoor = {}
 local maxVisibleDoors = 1
 local maxVisibleFakeDoors = 3
+local pickupCooldown = {}
+local COOLDOWN_TIME = 0.5
+local nearbyObjects = {}
+local NEARBY_UPDATE_INTERVAL = 0.5
+local PICKUP_RANGE = 15
 
 
 -- Configuración de la ventana principal
@@ -65,17 +70,17 @@ local othscripts = Window:MakeTab({
 })
 
 
-local function canCarry(v)
-    if not v or not v:FindFirstChild("ProximityPrompt", math.huge) or not v:FindFirstChild("ProximityPrompt", math.huge).Enabled then
+local function optimizedCanCarry(v)
+    if not v or 
+       not v:FindFirstChild("ProximityPrompt", math.huge) or 
+       not v:FindFirstChild("ProximityPrompt", math.huge).Enabled or
+       v.Name:match("Document") or 
+       v:GetAttribute("Price") then
         return false
     end
     
-    if v.Name:match("Document") then
+    if pickupCooldown[v] and tick() - pickupCooldown[v] < COOLDOWN_TIME then
         return false
-    end
-    
-    if v:GetAttribute("Price") then 
-        return false 
     end
     
     if v.Name:lower():match("battery") then
@@ -116,6 +121,24 @@ local function canCarry(v)
         end
     end
     return true
+end
+
+local function updateNearbyObjects()
+    local playerPos = game.Players.LocalPlayer.Character and 
+                     game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and 
+                     game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+    
+    if not playerPos then return end
+    
+    nearbyObjects = {}
+    for _, v in pairs(interacts) do
+        if v and v.Parent and v:IsA("BasePart") then
+            local distance = (v.Position - playerPos).Magnitude
+            if distance <= PICKUP_RANGE then
+                table.insert(nearbyObjects, v)
+            end
+        end
+    end
 end
 
 local cd = {}
@@ -754,13 +777,33 @@ end
 
 game:GetService("RunService").Heartbeat:Connect(function()
     if OrionLib.Flags.AutoPickup.Value then
-        for _, v in pairs(interacts) do
-            if v and v.Parent and v:FindFirstChild("ProximityPrompt") and canCarry(v.Parent) then
+        local now = tick()
+        if not nearbyObjects.lastUpdate or now - nearbyObjects.lastUpdate >= NEARBY_UPDATE_INTERVAL then
+            updateNearbyObjects()
+            nearbyObjects.lastUpdate = now
+        end
+        
+        for _, v in pairs(nearbyObjects) do
+            if v and v.Parent and v:FindFirstChild("ProximityPrompt") and optimizedCanCarry(v.Parent) then
                 fireproximityprompt(v.ProximityPrompt)
+                pickupCooldown[v.Parent] = tick()
             end
         end
     end
 end)
+
+-- Limpieza periódica del cooldown
+spawn(function()
+    while wait(10) do
+        local now = tick()
+        for obj, time in pairs(pickupCooldown) do
+            if now - time > COOLDOWN_TIME * 2 then
+                pickupCooldown[obj] = nil
+            end
+        end
+    end
+end)
+
 
 -- Control de velocidad del jugador
 game:GetService("RunService").Heartbeat:Connect(function()
