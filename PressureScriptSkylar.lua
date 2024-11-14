@@ -9,6 +9,7 @@ p.Anchored = true
 p.Parent = workspace
 
 -- Variables globales
+local interacts = {}
 local sp = 16
 local applied = {}
 local key = {}
@@ -64,18 +65,25 @@ local othscripts = Window:MakeTab({
 })
 
 
-
--- Función para Auto Pick up
 local function canCarry(v)
     if not v or not v:FindFirstChild("ProximityPrompt", math.huge) or not v:FindFirstChild("ProximityPrompt", math.huge).Enabled then
         return false
     end
     
-    if v:GetAttribute("Price") then return false end
+    if v.Name:match("Document") then
+        return false
+    end
     
-    local plr = game.Players.LocalPlayer
-    if not plr.PlayerFolder.Inventory:FindFirstChild(v.Name:gsub("Small", "Big"):gsub("Big", "")) then
-        if v:GetAttribute("InteractionType") == "KeyCard" and (plr.PlayerFolder.Inventory:FindFirstChild("NormalKeyCard") or plr.PlayerFolder.Inventory:FindFirstChild("RidgeKeyCard")) then
+    if v:GetAttribute("Price") then 
+        return false 
+    end
+    
+    if v.Name:lower():match("battery") then
+        return game.Players.LocalPlayer.PlayerFolder.Batteries.Value < 5
+    end
+    
+    if not game.Players.LocalPlayer.PlayerFolder.Inventory:FindFirstChild(v.Name:gsub("Small", "Big"):gsub("Big", "")) then
+        if v:GetAttribute("InteractionType") == "KeyCard" and (game.Players.LocalPlayer.PlayerFolder.Inventory:FindFirstChild("NormalKeyCard") or game.Players.LocalPlayer.PlayerFolder.Inventory:FindFirstChild("RidgeKeyCard")) then
             return false
         end
         return true
@@ -84,7 +92,7 @@ local function canCarry(v)
             return false
         end
 
-        local item = plr.PlayerFolder.Inventory:FindFirstChild(v.Name:gsub("Small", "Big"):gsub("Big", ""))
+        local item = game.Players.LocalPlayer.PlayerFolder.Inventory:FindFirstChild(v.Name:gsub("Small", "Big"):gsub("Big", ""))
 
         local res = false
         local doesExist = false
@@ -102,23 +110,84 @@ local function canCarry(v)
             return res
         end
 
-        if game.ReplicatedStorage.EquipableItems:FindFirstChild(v.Name:gsub("Small", "Big"):gsub("Big", "")) then
-            local maxStack = game.ReplicatedStorage.EquipableItems[v.Name:gsub("Small", "Big"):gsub("Big", "")]:GetAttribute("MaxStack")
-            if maxStack then
-                return item.Value < maxStack
-            end
+        if game.ReplicatedStorage.EquipableItems:FindFirstChild(v.Name:gsub("Small", "Big"):gsub("Big", "")) and 
+           game.ReplicatedStorage.EquipableItems[v.Name:gsub("Small", "Big"):gsub("Big", "")]:GetAttribute("MaxStack") then
+            return item.Value < game.ReplicatedStorage.EquipableItems[v.Name:gsub("Small", "Big"):gsub("Big", "")]:GetAttribute("MaxStack")
         end
     end
     return true
 end
 
-cons[#cons+1] = game.ProximityPromptService.PromptButtonHoldBegan:Connect(function(promt)
-	if vals.II then
-		fireproximityprompt(promt)
-	end
-end)
+local cd = {}
+local fppn = false
+local fpp = getfenv().fireproximityprompt
 
+if fpp then
+    pcall(function()
+        task.spawn(function()
+            local pp = Instance.new("ProximityPrompt", game.Players.LocalPlayer.Character)
+            local con; con = pp.Triggered:Connect(function()
+                print("fppn")
+                con:Disconnect()
+                pp:Destroy()
+                fppn = true
+            end)
+            task.wait(0.1)
+            fpp(pp)
+            task.wait(1.5)
+            if pp and pp.Parent then
+                pp:Destroy()
+                print("fppb")
+                con:Disconnect()
+            end
+        end)
+    end)
+end
 
+-- Updated fireproximityprompt function
+local function fireproximityprompt(pp)
+    if typeof(pp) ~= "Instance" or not pp:IsA("ProximityPrompt") or not pcall(function() return pp.Parent.GetPivot end) or cd[pp] or not workspace.CurrentCamera or ((game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character.HumanoidRootPart or workspace.CurrentCamera).CFrame.Position - pp.Parent:GetPivot().Position).Magnitude > pp.MaxActivationDistance then return end
+    if fppn then
+        return fpp(pp)
+    end
+    
+    cd[pp] = true
+    local a,b,c,d,e = pp.MaxActivationDistance, pp.Enabled, pp.Parent, pp.HoldDuration, pp.RequiresLineOfSight
+    local obj = Instance.new("Part", workspace)
+    obj.Transparency = 1
+    obj.CanCollide = false
+    obj.Size = Vector3.new(0.1, 0.1, 0.1)
+    obj.Anchored = true
+    obj:PivotTo(workspace.CurrentCamera.CFrame + (workspace.CurrentCamera.CFrame.LookVector / 5))
+    local con = workspace.CurrentCamera.Changed:Connect(function()
+        obj:PivotTo(workspace.CurrentCamera.CFrame + (workspace.CurrentCamera.CFrame.LookVector / 5))
+    end)
+    local function finish()
+        obj:Destroy()
+        con:Disconnect()
+    end
+    pp.Parent = obj
+    pp.MaxActivationDistance = math.huge
+    pp.Enabled = true
+    pp.HoldDuration = 0
+    pp.RequiresLineOfSight = false
+    if not pp then finish() return end
+    game["Run Service"].RenderStepped:Wait()
+    game["Run Service"].RenderStepped:Wait()
+    pp:InputHoldBegin()
+    game["Run Service"].RenderStepped:Wait()
+    pp:InputHoldEnd()
+    game["Run Service"].RenderStepped:Wait()
+    if pp.Parent == obj then
+        pp.Parent = c
+        pp.MaxActivationDistance = a
+        pp.Enabled = b
+        pp.HoldDuration = d
+        pp.RequiresLineOfSight = e
+    end
+    finish()
+    cd[pp] = false
+end
 
 -- Funciones de utilidad para ESP
 local function createBillboardGui(name, adornee, text, textColor)
@@ -459,30 +528,10 @@ Maikn:AddToggle({
 
 
 Maikn:AddToggle({
-    Name = "Auto Pick up loots",
+    Name = "Auto Pick up Loots",
     Default = false,
     Flag = "AutoPickup",
-    Save = true,
-    Callback = function(Value)
-        if Value then
-            game:GetService("RunService").Heartbeat:Connect(function()
-                if OrionLib.Flags.AutoPickup.Value then
-                    local player = game.Players.LocalPlayer
-                    local character = player.Character
-                    if not character then return end
-
-                    for _, v in ipairs(workspace:GetDescendants()) do
-                        if v:IsA("Model") and v:FindFirstChild("ProximityPrompt") and canCarry(v) then
-                            local prompt = v:FindFirstChild("ProximityPrompt")
-                            if prompt and prompt.Enabled then
-                                fireProximityPrompt(prompt)
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-    end    
+    Save = true
 })
 
 -- Toggles Esp
@@ -625,6 +674,11 @@ coroutine.resume(keycor)
 
 
 workspace.DescendantAdded:Connect(function(inst)
+    if inst.Name == "ProxyPart" and inst.Parent:IsA("Model") then
+        if inst.Parent.Parent:IsA("BasePart") and inst.Parent.Parent.Name ~= "ShopSpawn" then
+            table.insert(interacts, inst)
+        end
+    end
     if inst.Name == "OpenValue" and inst.Parent.Parent.Name == "Entrances" and OrionLib.Flags.doorESP.Value then
         task.wait(0.1)
         applyDoor(inst.Parent)
@@ -697,6 +751,16 @@ for _, v in ipairs(workspace.Rooms:GetDescendants()) do
     end
 end
 
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    if OrionLib.Flags.AutoPickup.Value then
+        for _, v in pairs(interacts) do
+            if v and v.Parent and v:FindFirstChild("ProximityPrompt") and canCarry(v.Parent) then
+                fireproximityprompt(v.ProximityPrompt)
+            end
+        end
+    end
+end)
 
 -- Control de velocidad del jugador
 game:GetService("RunService").Heartbeat:Connect(function()
