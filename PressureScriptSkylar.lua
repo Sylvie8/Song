@@ -590,7 +590,7 @@ Maikn:AddToggle({
 
 Maikn:AddToggle({
     Name = "Insta open door",
-    Default = true,
+    Default = false,
     Flag = "asdas",
     Save = true
 })
@@ -670,7 +670,7 @@ espp:AddToggle({
 
 
 espp:AddToggle({
-    Name = "Generador/Cables ESP",
+    Name = "Generador/Cables ESP\n(Activar antes del primer Searchlight)",
     Default = true,
     Flag = "generatorESP",
     Save = true,
