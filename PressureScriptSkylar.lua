@@ -940,3 +940,4 @@ game:GetService("RunService").Heartbeat:Connect(function()
             if not isCrouching then
                 humanoid.WalkSpeed = sp
             end
+            end) 
