@@ -933,10 +933,10 @@ game:GetService("RunService").Heartbeat:Connect(function()
     if character then
         local humanoid = character:FindFirstChild("Humanoid")
         if humanoid then
-            -- Check if player is crouching (using the default crouch state)
-            if not humanoid.StateChanged:Wait() == Enum.HumanoidStateType.Crouching then
+            -- Check if player is crouching (StateType enum 5 is Climbing)
+            local isCrouching = humanoid:GetState() == Enum.HumanoidStateType.Climbing
+            
+            -- Only apply custom speed if not crouching
+            if not isCrouching then
                 humanoid.WalkSpeed = sp
             end
-        end
-    end
-end)
