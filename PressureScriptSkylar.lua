@@ -933,8 +933,10 @@ game:GetService("RunService").Heartbeat:Connect(function()
     if character then
         local humanoid = character:FindFirstChild("Humanoid")
         if humanoid then
-            -- Check if player is crouching (using the default crouch state)
-            if not humanoid.StateChanged:Wait() == Enum.HumanoidStateType.Crouching then
+            -- Solo aplicar velocidad si el jugador NO está agachado
+            if humanoid.MoveDirection.Magnitude > 0 and humanoid:GetState() ~= Enum.HumanoidStateType.Crouching then
                 humanoid.WalkSpeed = sp
             end
-        end) 
+        end
+    end
+end)
