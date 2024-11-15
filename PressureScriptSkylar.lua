@@ -937,4 +937,4 @@ game:GetService("RunService").Heartbeat:Connect(function()
             if not humanoid.StateChanged:Wait() == Enum.HumanoidStateType.Crouching then
                 humanoid.WalkSpeed = sp
             end
-        end
+        end) 
