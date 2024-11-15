@@ -929,5 +929,14 @@ end)
 
 -- Control de velocidad del jugador
 game:GetService("RunService").Heartbeat:Connect(function()
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = sp
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            -- Check if player is crouching (using the default crouch state)
+            if not humanoid.StateChanged:Wait() == Enum.HumanoidStateType.Crouching then
+                humanoid.WalkSpeed = sp
+            end
+        end
+    end
 end)
