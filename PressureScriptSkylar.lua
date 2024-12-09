@@ -604,7 +604,7 @@ Maikn:AddButton({
 
 Maikn:AddToggle({
     Name = "Notify Monster",
-    Default = true,
+    Default = false,
     Flag = "NotifyMonster",
     Save = true
 })
@@ -642,7 +642,7 @@ espp:AddToggle({
 
 espp:AddToggle({
     Name = "Fake Door ESP",
-    Default = false,
+    Default = true,
     Flag = "fakeDoorESP",
     Save = true,
     Callback = function(Value)
@@ -694,7 +694,7 @@ espp:AddToggle({
 
 espp:AddToggle({
     Name = "Generador/Cables ESP\n(Activar antes del primer Searchlight)",
-    Default = false,
+    Default = true,
     Flag = "generatorESP",
     Save = true,
     Callback = function(Value)
