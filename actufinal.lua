@@ -617,6 +617,6 @@ end
 
 
 -- Control de velocidad del jugador
-game:GetService("RunService").Heartbeat:Connect(function()
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = sp
-end)
+--game:GetService("RunService").Heartbeat:Connect(function()
+    --game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = sp
+--end)
