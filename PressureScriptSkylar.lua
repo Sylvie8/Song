@@ -602,6 +602,18 @@ Maikn:AddButton({
     end    
 })
 
+Maikn:AddButton({
+    Name = "Anti Fullbright",
+    Callback = function()
+        local lighting = game.Lighting
+        lighting.Brightness = 0
+        lighting.ClockTime = 0
+        lighting.FogEnd = 2000
+        lighting.GlobalShadows = true
+        lighting.OutdoorAmbient = Color3.fromRGB(0, 0, 0)
+    end    
+})
+
 Maikn:AddToggle({
     Name = "Notify Monster",
     Default = false,
