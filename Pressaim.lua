@@ -648,7 +648,7 @@ RunService.RenderStepped:Connect(function()
             if targetPart then
                 -- Wall Check (Raycasting)
                 local raycastParams = RaycastParams.new()
-                raycastParams.FilterDescendantsInstances = {LocalPlayer.Character, entity}
+                raycastParams.FilterDescendantsInstances = {LocalPlayer.Character}
                 raycastParams.FilterType = Enum.RaycastFilterType.Exclude
                 
                 local result = workspace:Raycast(Camera.CFrame.Position, (targetPart.Position - Camera.CFrame.Position).Unit * 1000, raycastParams)
