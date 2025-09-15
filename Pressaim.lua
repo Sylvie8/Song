@@ -560,6 +560,12 @@ RunService.RenderStepped:Connect(function()
 
         local hrp = entity:FindFirstChild("HumanoidRootPart")
         if hrp then
+            local humanoid = entity:FindFirstChildOfClass("Humanoid")
+            if not humanoid or humanoid.Health <= 0 then
+                removeTarget(entity) -- Si el humanoide no existe o está muerto, lo eliminamos
+                continue
+            end
+            
             if not espData[entity] then espData[entity] = {} end
 
             -- ESP de cajas
@@ -640,6 +646,18 @@ RunService.RenderStepped:Connect(function()
             
             local targetPart = entity:FindFirstChild(aimbotTarget)
             if targetPart then
+                -- Wall Check (Raycasting)
+                local raycastParams = RaycastParams.new()
+                raycastParams.FilterDescendantsInstances = {LocalPlayer.Character, entity}
+                raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+                
+                local result = workspace:Raycast(Camera.CFrame.Position, (targetPart.Position - Camera.CFrame.Position).Unit * 1000, raycastParams)
+                
+                if result and result.Instance and not result.Instance:IsDescendantOf(entity) then
+                    -- Rayo choca con algo que no es el objetivo ni el jugador.
+                    continue
+                end
+
                 local screenPos, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
                 if onScreen then
                     local dist = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
